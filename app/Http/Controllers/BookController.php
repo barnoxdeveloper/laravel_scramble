@@ -17,7 +17,6 @@ class BookController extends Controller
         return response()->json($books);
     }
 
-
     /**
      * Created new book.
      */
@@ -38,24 +37,36 @@ class BookController extends Controller
     /**
      * Display the specified book.
      */
-    public function show(Book $book)
+    public function show($id)
     {
-        //
+        return Book::findOrFail($id);
     }
 
     /**
      * Update the specified book in storage.
      */
-    public function update(Request $request, Book $book)
+    public function update(Request $request, $id)
     {
-        //
+        $data = $request->validate([
+            'title' => ['required', 'max:255', 'string'],
+            'description' => ['required', 'string'],
+            'author' => ['required', 'max:255', 'string'],
+            'publication_date' => ['required', 'date'],
+        ]);
+
+        $book = Book::findOrFail($id);
+        $book->update($data);
+
+        return new BookResource($book);
     }
 
     /**
      * Remove the specified book from storage.
      */
-    public function destroy(Book $book)
+    public function destroy($id)
     {
-        //
+        $book = Book::findOrFail($id);
+        $book->delete();
+        return response()->json(null, 204);
     }
 }
